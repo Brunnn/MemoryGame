@@ -1,9 +1,6 @@
 package com.game.menu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -18,30 +15,34 @@ public class Menu extends JPanel implements ActionListener{
 
 
 	private JLabel _gameTitleJLabel = new JLabel("Jogo da Memória!!");
-	private Configuration gameConfiguration = new Configuration();
+	private Configuration _gameConfiguration = new Configuration();
 
 	private DifficultySelectionPanel _difficultySelectionPanel = new DifficultySelectionPanel(this);
 	private ModeSelectionPanel _modeSelectionPanel = new ModeSelectionPanel(this);
 	
-	public Menu(ActionListener responsibleMenu) {
+	private MenuActionListener _responsibleMenu;
+	public Menu(MenuActionListener responsibleMenu) {
 		super();
 		setBackground(Constants.backgroundColor);
 		setFocusable(true);
+		
+		_responsibleMenu = responsibleMenu;
 		
 		add(_gameTitleJLabel);
 		add(_modeSelectionPanel);
 		add(_difficultySelectionPanel);
 		
 		showFirstStep();
-		addExitListener();
 	}
 	
+	//Mostra a seleção de jogadores
 	public void showFirstStep() 
 	{
 		_modeSelectionPanel.setVisible(true);
 		_difficultySelectionPanel.setVisible(false);
 	}
 	
+	//Mostra a seleção de dificuldade
 	public void showSecondStep()
 	{
 
@@ -50,49 +51,31 @@ public class Menu extends JPanel implements ActionListener{
 		
 	}
 	
+	//Finaliza as configurações de Menu, e alerta o componente responsavel pelo Menu
 	public void finishMenu() 
 	{
-		
+		_responsibleMenu.ConfigurationFinished(_gameConfiguration);
 	}
 	
+	
+	//Escuta os eventos que acontecem dentro do Menu
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		MenuCommand actionTaken = MenuCommand.fromString(e.getActionCommand());
 		
 		if (actionTaken.equals(MenuCommand.modeSelectionSinglePlayer) || actionTaken.equals(MenuCommand.modeSelectionMultiPlayer))
 		{
-			gameConfiguration.setPlayerCount(actionTaken.getValue());
+			_gameConfiguration.setPlayerCount(actionTaken.getValue());
 			showSecondStep();
 		}
 		else if (actionTaken.equals(MenuCommand.difficultySelectionEasy)
 				|| actionTaken.equals(MenuCommand.difficultySelectionNormal)
 				|| actionTaken.equals(MenuCommand.difficultySelectionHard))
 		{
-			gameConfiguration.setGameDifficulty(actionTaken.getValue());
+			_gameConfiguration.setGameDifficulty(actionTaken.getValue());
 			finishMenu();
 		}
 	}
 	
-	private void addExitListener() {
-		addKeyListener(new KeyListener() {
-			
-			@Override
-			public void keyTyped(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void keyReleased(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
-					System.exit(0);
-			}
-			
-			@Override
-			public void keyPressed(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
-	}
+	
 }
